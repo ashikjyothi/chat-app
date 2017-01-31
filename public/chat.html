@@ -1,9 +1,11 @@
 <div ng-controller="chatController">
-    <div class="msgBox">
+    <div class="msgBox container">
         <div ng-repeat = "msg in messages">
-            {{msg.sender}} : {{msg.text}}
+            <blockquote>{{msg.sender}} : {{msg.text}}</blockquote>
         </div>
         <div>
-    <input type = "text" ng-model= "messageInput"><br>
-    <button ng-click = "sendMessage(messageInput)">Send</button>
+        <div class="form-group input-group">
+    <input type = "text" placeholder="Type the message..." ng-model= "messageInput">
+    <button class="btn btn-primary" ng-click="sendMessage(messageInput)">Send</button>
+    </div>
 </div>
