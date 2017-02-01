@@ -5,8 +5,9 @@
   "main": "server.js",
   "dependencies": {
     "express": "^4.14.0",
-    "mongoose":"latest",
-    "socket.io":"latest"
+    "moment": "^2.17.1",
+    "mongoose": "latest",
+    "socket.io": "latest"
   },
   "devDependencies": {},
   "scripts": {

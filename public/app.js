@@ -95,9 +95,14 @@ angular.module('myApp',['ui.router'])
         $scope.sendMessage = function (text){
             console.log("sendMessage function start");
             if(text){
+                var timestamp = moment().valueOf();
+                var momentTime = moment.utc(timestamp);
+                    momentTime = momentTime.local().format('h:mm a');
+
                 var newMessage = {
                     sender : $scope.user,
-                    text : text
+                    text : text,
+                    time : momentTime
                 }
             Socket.emit("chatMessage",newMessage,function(response){
                 if(response == 'success'){

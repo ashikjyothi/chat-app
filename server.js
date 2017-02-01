@@ -1,6 +1,7 @@
 var express = require('express'),
     mongoose = require('mongoose'),
     socketio = require('socket.io'),
+    moment = require('moment'),
     http = require('http');
  var app = express();
 
@@ -33,7 +34,8 @@ var express = require('express'),
 
  var chatSchema = mongoose.Schema({
      sender : String,
-     text : String
+     text : String,
+     time : String
  });
 
  var Chat =  mongoose.model('Chat', chatSchema);
@@ -54,9 +56,12 @@ var express = require('express'),
  }
 
  function addMessage(message,cb){
+     
+
      var newMsg = new Chat({
          sender : message.sender,
-         text : message.text
+         text : message.text,
+         time : message.time
      })
      newMsg.save(function(error,result){
          if(error){
