@@ -11,7 +11,7 @@ var express = require('express'),
 
  app.use(express.static(__dirname + '/public'));
 
- 
+ var clientInfo = {};
 
 
  mongoose.connect("mongodb://localhost:27017/chatapp", function(err){
@@ -35,7 +35,8 @@ var express = require('express'),
  var chatSchema = mongoose.Schema({
      sender : String,
      text : String,
-     time : String
+     time : String,
+     room : String
  });
 
  var Chat =  mongoose.model('Chat', chatSchema);
@@ -47,7 +48,7 @@ var express = require('express'),
      newUser.save(function(error, result){
          if(error){
              console.log("Error Saving Data",error)
-             cb(error);
+             cb("error");
          }else {
              console.log("Username saved");
              cb("success");
@@ -61,7 +62,8 @@ var express = require('express'),
      var newMsg = new Chat({
          sender : message.sender,
          text : message.text,
-         time : message.time
+         time : message.time,
+         room : message.room
      })
      newMsg.save(function(error,result){
          if(error){
@@ -76,11 +78,22 @@ var express = require('express'),
 io.on('connection',function(socket){
 
 
+    socket.on('joinRoom',function(req){
+        clientInfo[socket.id]=req;
+        socket.join(req.room);
+        socket.broadcast.to(req.room).emit('chatMessage',{
+            sender: "System",
+            text: req.name + "has joined chat!",
+            time: "",
+            room: req.room
+        })
+    })
+
     console.log("Connected");
-    socket.on('register',function(username,fn){
+    socket.on('register',function(Ud,fn){
 
         console.log("received register request")
-        addUser(username,function(response){
+        addUser(Ud.username,function(response){
             fn(response);
         })
     })

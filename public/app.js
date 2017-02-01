@@ -1,9 +1,10 @@
 angular.module('myApp',['ui.router'])
     .service('Session', function(){
         this.user = null;
-        this.setUser = function(username,cb){
+        this.setUser = function(Ud,cb){
             console.log("Service setuser start")
-            this.user = username;
+            this.user = Ud.username;
+            this.room = Ud.room;
             cb();
 
         }
@@ -57,6 +58,7 @@ angular.module('myApp',['ui.router'])
     })
     .service('Socket',function($timeout){
         var socket = io();
+
         this.emit = function(event,data,cb){
             console.log("Emitting::",event,data);
             socket.emit(event,data,function(response){
@@ -79,19 +81,35 @@ angular.module('myApp',['ui.router'])
     })
     .controller('loginController',['$scope','$location','Session','Socket',function($scope,$location,Session,Socket){
         console.log("Socket::",Socket);
+        $scope.errorText = "";
         $scope.login = function(){
-            Socket.emit('register',$scope.username,function(response){
+            var usrDetails = {username: $scope.username, room: $scope.room};
+            // console.log("usrDetails:"+ usrDetails.username+" "+ usrDetails.room);
+
+        Socket.emit('joinRoom',{
+            name: usrDetails.username,
+            room: usrDetails.room
+        })
+
+            
+
+
+            Socket.emit('register',usrDetails,function(response){
                     console.log('login Response',response)
                     if(response == 'success'){
-                        Session.setUser($scope.username,function(response){
+                        Session.setUser(usrDetails,function(response){
                             $location.path('/');
                         })
+                    }
+                    if(response == 'error'){
+                        $scope.errorText = "Username already taken";
                     }
             });
         }
     }])
     .controller('chatController',['$scope','Socket','Session',function($scope,Socket,Session){
         $scope.user = Session.user;
+        $scope.room = Session.room;
         $scope.sendMessage = function (text){
             console.log("sendMessage function start");
             if(text){
@@ -102,7 +120,8 @@ angular.module('myApp',['ui.router'])
                 var newMessage = {
                     sender : $scope.user,
                     text : text,
-                    time : momentTime
+                    time : momentTime,
+                    room : $scope.room
                 }
             Socket.emit("chatMessage",newMessage,function(response){
                 if(response == 'success'){

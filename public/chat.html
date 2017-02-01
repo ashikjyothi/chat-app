@@ -1,8 +1,10 @@
 <div ng-controller="chatController">
+     <h2>Room: {{room}}</h2>
     <div class="msgBox container">
     <div class="well">
         <div ng-repeat = "msg in messages">
-            <blockquote>
+            <blockquote ng-if="msg.room == room">
+
             {{msg.sender}} : {{msg.text}}
             <small>
             	{{msg.time}}
