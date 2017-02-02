@@ -13,7 +13,6 @@ var express = require('express'),
 
  var clientInfo = {};
 
-
  mongoose.connect("mongodb://localhost:27017/chatapp", function(err){
      if(err)
      {
@@ -24,10 +23,12 @@ var express = require('express'),
  })
 
  var userSchema = mongoose.Schema({
+    socketid : String,
      username : {
          type : String,
          unique : true
-     }
+     },
+     room : String
  }); 
 
  var User = mongoose.model('User', userSchema);
@@ -77,13 +78,15 @@ var express = require('express'),
 
 io.on('connection',function(socket){
 
+    var socketID = socket.id;
 
     socket.on('joinRoom',function(req){
-        clientInfo[socket.id]=req;
+        clientInfo.socketID= {name:req.name,room:req.room};
+ 
         socket.join(req.room);
         socket.broadcast.to(req.room).emit('chatMessage',{
             sender: "System",
-            text: req.name + "has joined chat!",
+            text: req.name + " has joined chat!",
             time: "",
             room: req.room
         })
@@ -91,7 +94,6 @@ io.on('connection',function(socket){
 
     console.log("Connected");
     socket.on('register',function(Ud,fn){
-
         console.log("received register request")
         addUser(Ud.username,function(response){
             fn(response);
@@ -113,14 +115,37 @@ io.on('connection',function(socket){
                 console.log("error:",error);
                 fn(error);
             }else{
-                console.log("getMessages result:",result);
+                //console.log("getMessages result:",result);
                 fn(result);
             }
         })
     })
     socket.on('disconnect',function(){
-        
 
+        try {
+            var ci = clientInfo.socketID.name;
+            if (ci == 'undefined') throw ('undefined');
+            else {
+
+            socket.broadcast.emit('chatMessage',{
+            sender: "System",
+            text: clientInfo.socketID.name + " has disconnected!",
+            time: "",
+            room: clientInfo.socketID.room
+        })
+            delete clientInfo.socketID;
+
+        }
+            }
+            
+
+        catch (error){
+            console.log(error);
+        }
+
+        // }
+        
+        
     })
     
 })

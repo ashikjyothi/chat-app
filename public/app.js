@@ -90,6 +90,9 @@ angular.module('myApp',['ui.router'])
             name: usrDetails.username,
             room: usrDetails.room
         })
+        // Socket.on('clientInfo',function(ci){
+        //     console.log("clientInfo"+ci);
+        // })
 
             
 

@@ -2,6 +2,18 @@
     .jumbotron {
         display: none;
     }
+    .msgBox {
+        width: 1000px;
+        height: 480px;
+        overflow: auto;
+    }
+    .well {
+        overflow: auto;
+    }
+    .form-group {
+        position: fixed;
+        bottom: 0px;
+    }
 </style>
 <div ng-controller="chatController">
      <h2 class="h2room">Room: {{room}}</h2>
@@ -19,7 +31,7 @@
         </div>
         <div>
         <div class="form-group input-group">
-    <input type = "text" placeholder="Type the message..." ng-model= "messageInput" size="85">
+    <input type = "text" placeholder="Type the message..." ng-model= "messageInput" size="55">
     <button class="btn btn-primary" ng-click="sendMessage(messageInput)">Send</button>
     </div>
 </div>
