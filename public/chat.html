@@ -1,5 +1,10 @@
+<style>
+    .jumbotron {
+        display: none;
+    }
+</style>
 <div ng-controller="chatController">
-     <h2>Room: {{room}}</h2>
+     <h2 class="h2room">Room: {{room}}</h2>
     <div class="msgBox container">
     <div class="well">
         <div ng-repeat = "msg in messages">
@@ -14,7 +19,7 @@
         </div>
         <div>
         <div class="form-group input-group">
-    <input type = "text" placeholder="Type the message..." ng-model= "messageInput">
+    <input type = "text" placeholder="Type the message..." ng-model= "messageInput" size="85">
     <button class="btn btn-primary" ng-click="sendMessage(messageInput)">Send</button>
     </div>
 </div>

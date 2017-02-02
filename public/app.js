@@ -126,6 +126,7 @@ angular.module('myApp',['ui.router'])
             Socket.emit("chatMessage",newMessage,function(response){
                 if(response == 'success'){
                     $scope.messages.push(newMessage)
+                    $scope.messageInput = "";
                 }
             });
             }

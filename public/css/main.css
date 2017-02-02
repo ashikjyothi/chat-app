@@ -1,0 +1,17 @@
+.jumbotron {
+padding-left: 30px;
+}
+
+.h2login {
+	padding-left: 300px;
+}
+
+.h2room {
+	padding-left: 40px;
+}
+
+.chatdiv {
+	overflow-y: auto;
+	height: 300px;
+	max-height: 800px;
+}
