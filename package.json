@@ -4,7 +4,10 @@
   "description": "",
   "main": "server.js",
   "dependencies": {
+    "connect-mongo": "^1.3.2",
+    "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
+    "express-session": "^1.15.0",
     "moment": "^2.17.1",
     "mongoose": "latest",
     "socket.io": "latest"
