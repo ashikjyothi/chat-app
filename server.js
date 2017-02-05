@@ -6,14 +6,10 @@ var express = require('express'),
     socketio = require('socket.io'),
     moment = require('moment'),
     http = require('http');
-
 var app = express();
-
 var server = http.createServer(app).listen(3000);
 var io = socketio.listen(server);
-
 // app.use(cookieParser);
-
 // app.use(session({
 //     secret: 'mysecret',
 //     resave: false,
@@ -25,7 +21,6 @@ var io = socketio.listen(server);
 //         url: 'mongodb://localhost:27017/chatapp'
 //     })
 // }))
-
 app.use(express.static(__dirname + '/public'));
 var clientInfo = {};
 mongoose.connect("mongodb://localhost:27017/chatapp", function(err) {
@@ -87,22 +82,21 @@ function addMessage(message, cb) {
 }
 io.on('connection', function(socket) {
     var socketID = socket.id;
-    socket.on('initSocket',function(user){
-            console.log("NEW SOCKET ID::"+socket.id);
-
-
-           User.findOne({username: user}, function (err, user) {
+    socket.on('initSocket', function(user) {
+        console.log("NEW SOCKET ID::" + socket.id);
+        User.findOne({
+            username: user
+        }, function(err, user) {
+            if (user) {
                 user.socketid = socket.id;
-
-                user.save(function (err) {
-                if(err) {
-                console.error('ERROR!');
-                 }
+                user.save(function(err) {
+                    if (err) {
+                        console.error('ERROR!');
+                    }
                 });
-                });
-
-        })
-
+            }
+        });
+    })
     socket.on('joinRoom', function(req) {
         clientInfo.socketID = {
             name: req.name,
@@ -138,9 +132,9 @@ io.on('connection', function(socket) {
                 var socketID = result[0].socketid;
                 console.log("Private User SocketID::" + result[0].socketid);
                 io.to(socketID).emit('chatMessage', {
-                    sender: pm.user,
+                    sender: pm.sender,
                     text: pm.msg,
-                    time: "",
+                    time: "Private Message",
                     room: pm.room
                 })
                 fn(result);
@@ -169,11 +163,10 @@ io.on('connection', function(socket) {
         })
     })
     socket.on('logout', function(user, cb) {
-
-        if(socket.id){
+        if (socket.id) {
             User.remove({
                 socketid: socket.id
-            },function(err, res) {
+            }, function(err, res) {
                 if (err) {
                     console.log('User remove err:::', err)
                 } else {
@@ -181,10 +174,6 @@ io.on('connection', function(socket) {
                 }
             });
         }
-
-
-
-
         console.log('disconnect')
         // try {
         //     var ci = clientInfo.socketID.name;

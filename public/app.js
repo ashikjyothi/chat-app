@@ -124,10 +124,12 @@ angular.module('myApp', ['ui.router']).service('Session', function() {
     $scope.sendMessage = function(text) {
         if (text && text.substr(0, 1) === '/') {
             var privatemsg = {};
+            privatemsg.sender = $scope.user;
             privatemsg.user = text.substr(1, text.indexOf(' '));
             privatemsg.user = privatemsg.user.trim();
             privatemsg.msg = text.substring(text.indexOf(' '));
             privatemsg.room = $scope.room;
+            $scope.messageInput = "";
             Socket.emit("PrivateMsg", privatemsg, function(response) {
                 console.log("PrivateMsg response:" + response);
             });
@@ -159,7 +161,9 @@ angular.module('myApp', ['ui.router']).service('Session', function() {
             $scope.messages = messages;
             $timeout(() => {
                 var container = document.getElementById('messageContainer');
-                container.scrollTop = container.scrollHeight - container.clientHeight;
+                if (container) {
+                    container.scrollTop = container.scrollHeight - container.clientHeight;
+                }
             });
         })
     }
