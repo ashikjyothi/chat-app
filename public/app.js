@@ -52,7 +52,7 @@ angular.module('myApp', ['ui.router']).service('Session', function() {
             }
         } else if (toState.url == '/login') {
             if (Session.user) {
-                console.log('HEREEEEEEEEEEEEEE')
+                // console.log('HEREEEEEEEEEEEEEE')
                 e.preventDefault();
                 $state.go('chat', {});
             }

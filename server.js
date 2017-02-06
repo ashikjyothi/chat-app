@@ -1,7 +1,4 @@
 var express = require('express'),
-    cookieParser = require('cookie-parser'),
-    session = require('express-session'),
-    MongoStore = require('connect-mongo')(session),
     mongoose = require('mongoose'),
     socketio = require('socket.io'),
     moment = require('moment'),
@@ -9,18 +6,7 @@ var express = require('express'),
 var app = express();
 var server = http.createServer(app).listen(3000);
 var io = socketio.listen(server);
-// app.use(cookieParser);
-// app.use(session({
-//     secret: 'mysecret',
-//     resave: false,
-//     saveUninitialized: true,
-//     cookie: {
-//         secure: true
-//     },
-//     store: new MongoStore({
-//         url: 'mongodb://localhost:27017/chatapp'
-//     })
-// }))
+
 app.use(express.static(__dirname + '/public'));
 var clientInfo = {};
 mongoose.connect("mongodb://localhost:27017/chatapp", function(err) {
@@ -127,7 +113,7 @@ io.on('connection', function(socket) {
             if (err) {
                 console.log("Private message not send-Invalid User");
             } else {
-                console.log("Array length" + result.length);
+                console.log("Array length:" + result.length);
                 console.log("Private User name::" + result[0].username);
                 var socketID = result[0].socketid;
                 console.log("Private User SocketID::" + result[0].socketid);

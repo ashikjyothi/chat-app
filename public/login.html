@@ -9,7 +9,7 @@
         <div class="chatdiv">
         <div class="input-group">
         <form>
-            <input ng-model="username" type="text" placeholder="Username" size="35" /><span>{{errorText}}</span><br><br>
+            <input ng-model="username" type="text" placeholder="Username" size="35" /><span><div class="alert alert-dismissible alert-danger" ng-show="errorText"><button type="button" class="close" ng-click="errorText=''" data-dismiss="alert">&times;</button><strong>{{errorText}}</strong></div></span><br><br>
             <input ng-model="room" type="text" placeholder="Room" size="35" /><br>
             <br>
             <button class="btn btn-primary pull-right" ng-click="login()">Login</button>
