@@ -86,6 +86,15 @@ angular.module('myApp', ['ui.router']).service('Session', function() {
     console.log("Socket::", Socket);
     $scope.errorText = "";
     $scope.login = function() {
+
+        if(angular.isUndefined($scope.username) || angular.isUndefined($scope.room)){
+            console.log("UNDEFINED DETECTED");
+            $scope.errorText = "Enter valid Details";
+            $scope.username = undefined;
+            $scope.room = undefined;
+            $location.path('/');
+        } else {
+
         var usrDetails = {
             username: $scope.username,
             room: $scope.room
@@ -109,6 +118,7 @@ angular.module('myApp', ['ui.router']).service('Session', function() {
                 $scope.errorText = "Username already taken";
             }
         });
+        }
     }
 }]).controller('chatController', ['$scope', 'Socket', 'Session', '$state', '$timeout', function($scope, Socket, Session, $state, $timeout) {
     $scope.user = Session.user;
