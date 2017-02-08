@@ -161,31 +161,7 @@ io.on('connection', function(socket) {
             });
         }
         console.log('disconnect')
-        // try {
-        //     var ci = clientInfo.socketID.name;
-        //     if (ci == 'undefined') throw ('undefined');
-        //     else {
-        //         User.remove({
-        //             username: clientInfo.socketID.name
-        //         }, function(err) {
-        //             if (!err) {
-        //                 console.log("Username deleted from database");
-        //             } else {
-        //                 console.log("Error deleting username from database");
-        //             }
-        //         });
-        //         socket.broadcast.emit('chatMessage', {
-        //             sender: "System",
-        //             text: clientInfo.socketID.name + " has disconnected!",
-        //             time: "",
-        //             room: clientInfo.socketID.room
-        //         })
-        //         delete clientInfo.socketID;
-        //     }
-        // } catch (error) {
-        //     console.log(error);
-        // }
-        // }
+ 
     })
 })
 app.get('/', function(req, res) {
