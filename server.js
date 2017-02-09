@@ -40,7 +40,7 @@ function addUser(un, cb) {
             cb("error");
         }else {
         console.log("DATA SAVED IN MYDB");
-        console.log(result);
+        // console.log(result);
         cb("success");
         }
 
@@ -80,7 +80,7 @@ io.on('connection', function(socket) {
             console.error('ERROR!::'+err);
         }else {
         console.log("SOCKETID CHANGED IN MYDB");
-        console.log(result); 
+        // console.log(result); 
         }
 
         });
@@ -159,7 +159,7 @@ io.on('connection', function(socket) {
            fn(error); 
        }else {
             console.log("FETCHED MSGS FROM MYDB");
-            console.log(results);
+            // console.log(results);
             fn(results);
        }
 

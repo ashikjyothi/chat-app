@@ -82,11 +82,26 @@ angular.module('myApp', ['ui.router']).service('Session', function() {
             })
         })
     }
-}).controller('loginController', ['$scope', '$location', 'Session', 'Socket', function($scope, $location, Session, Socket) {
+}).controller('loginController', ['$scope', '$location', 'Session', 'Socket','$timeout', function($scope, $location, Session, Socket,$timeout) {
     console.log("Socket::", Socket);
     $scope.errorText = "";
-    $scope.login = function() {
+    $scope.admin = false;
+    $scope.$watch('username', function() {
+        if($scope.username == "Admin") {
+        console.log("ADMIN DETECTED");
+        $scope.admin = true;
+        
+        }else{
+        // console.log("Admin NOT DETECTED");
+        $scope.admin = false;
+        }      
 
+    });
+
+
+
+    $scope.login = function() {
+        
         if(angular.isUndefined($scope.username) || angular.isUndefined($scope.room)){
             console.log("UNDEFINED DETECTED");
             $scope.errorText = "Enter valid Details";
