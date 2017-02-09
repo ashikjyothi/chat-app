@@ -1,5 +1,4 @@
 var express = require('express'),
-    mongoose = require('mongoose'),
     socketio = require('socket.io'),
     moment = require('moment'),
     http = require('http');
@@ -7,81 +6,86 @@ var app = express();
 var server = http.createServer(app).listen(3000);
 var io = socketio.listen(server);
 
+
+var mysql      = require('mysql');
+var connection = mysql.createConnection({
+  host     : 'localhost',
+  user     : 'root',
+  password : 'root',
+  database : 'my_db'
+});
+
+connection.connect(function(err) {
+  if (err) {
+    console.error('error connecting: ' + err.stack);
+    return;
+  }
+ 
+  console.log('connected as id ' + connection.threadId);
+});
+
 app.use(express.static(__dirname + '/public'));
 var clientInfo = {};
-mongoose.connect("mongodb://localhost:27017/chatapp", function(err) {
-    if (err) {
-        console.log("Error connecting to database");
-    } else {
-        console.log("Mongo Working");
-    }
-})
-var userSchema = mongoose.Schema({
-    socketid: String,
-    username: {
-        type: String,
-        unique: true
-    },
-    room: String
-});
-var User = mongoose.model('User', userSchema);
-var chatSchema = mongoose.Schema({
-    sender: String,
-    text: String,
-    time: String,
-    room: String
-});
-var Chat = mongoose.model('Chat', chatSchema);
 
 function addUser(un, cb) {
-    var newUser = new User({
-        socketid: un.socketid,
+
+    var post  = {
+      socketid: un.socketid,
         username: un.username,
         room: un.room
-    })
-    newUser.save(function(error, result) {
-        if (error) {
+    };
+    connection.query("INSERT INTO User SET ?",[post], function (error, result) {
+        if(error) {
             console.log("Error Saving Data", error)
             cb("error");
-        } else {
-            console.log("Username saved");
-            cb("success");
+        }else {
+        console.log("DATA SAVED IN MYDB");
+        console.log(result);
+        cb("success");
         }
-    })
+
+    });
+
+
 }
 
 function addMessage(message, cb) {
-    var newMsg = new Chat({
+
+    var post  = {
         sender: message.sender,
         text: message.text,
         time: message.time,
         room: message.room
-    })
-    newMsg.save(function(error, result) {
-        if (error) {
-            console.log("Error:", error);
-        } else {
-            // console.log("Database messsage save:",result);
-            cb('success');
+    };
+        connection.query("INSERT INTO Chat SET ?",[post], function (err, result) {
+        if(err) {
+            console.log("Error:", err);
+        }else {
+        console.log("CHAT SAVED IN MYDB");
+        console.log(result);
+        cb('success');
         }
-    })
+
+    });
+
+
 }
 io.on('connection', function(socket) {
     var socketID = socket.id;
     socket.on('initSocket', function(user) {
         console.log("NEW SOCKET ID::" + socket.id);
-        User.findOne({
-            username: user
-        }, function(err, user) {
-            if (user) {
-                user.socketid = socket.id;
-                user.save(function(err) {
-                    if (err) {
-                        console.error('ERROR!');
-                    }
-                });
-            }
+
+        connection.query("UPDATE User SET socketid = ? WHERE username = ?",[socket.id,user], function (err, result) {
+        if(err) {
+            console.error('ERROR!::'+err);
+        }else {
+        console.log("SOCKETID CHANGED IN MYDB");
+        console.log(result); 
+        }
+
         });
+
+
     })
     socket.on('joinRoom', function(req) {
         clientInfo.socketID = {
@@ -106,17 +110,20 @@ io.on('connection', function(socket) {
         })
     })
     socket.on('PrivateMsg', function(pm, fn) {
-        console.log("Received emitted privatemsg from:" + pm.user);
-        User.find({
-            username: pm.user
-        }, function(err, result) {
-            if (err) {
+        console.log("Received emitted privatemsg from:" + pm.sender);
+
+        /*===============================================
+        =            Find PM USER from my_db            =
+        ===============================================*/
+        connection.query('SELECT * FROM `User` WHERE `username` = ?',[pm.user], function (error, result) {
+            if (error) {
                 console.log("Private message not send-Invalid User");
             } else {
-                console.log("Array length:" + result.length);
-                console.log("Private User name::" + result[0].username);
-                var socketID = result[0].socketid;
-                console.log("Private User SocketID::" + result[0].socketid);
+            console.log("FOUND PM RECEIVER FROM MYDB");
+            console.log("MYDB PM RESULTLEN:"+result.length);
+            console.log("Private User name" + result[0].username);
+            var socketID = result[0].socketid;
+            console.log("Private User SocketID" + result[0].socketid);
                 io.to(socketID).emit('chatMessage', {
                     sender: pm.sender,
                     text: pm.msg,
@@ -125,7 +132,11 @@ io.on('connection', function(socket) {
                 })
                 fn(result);
             }
-        })
+
+
+        });
+        
+
     })
     socket.on('chatMessage', function(message, fn) {
         addMessage(message, function(response) {
@@ -138,28 +149,39 @@ io.on('connection', function(socket) {
         })
     })
     socket.on('getMessages', function(input, fn) {
-        Chat.find({}, function(error, result) {
-            if (error) {
-                console.log("error:", error);
-                fn(error);
-            } else {
-                //console.log("getMessages result:",result);
-                fn(result);
-            }
-        })
+
+        /*==========================================
+        =            get msgs from mydb            =
+        ==========================================*/
+        connection.query('SELECT * FROM `Chat`',function (error, results) {
+        if (error) {
+           console.log("error:", error);
+           fn(error); 
+       }else {
+            console.log("FETCHED MSGS FROM MYDB");
+            console.log(results);
+            fn(results);
+       }
+
+
+        });
+        
+
     })
     socket.on('logout', function(user, cb) {
-        if (socket.id) {
-            User.remove({
-                socketid: socket.id
-            }, function(err, res) {
-                if (err) {
-                    console.log('User remove err:::', err)
-                } else {
-                    cb();
-                }
-            });
-        }
+        /*=============================================
+        =            delete user from mydb            =
+        =============================================*/
+        connection.query('DELETE FROM User WHERE socketid = ?',[socket.id], function (error, results, fields) {
+          if (error) {
+            console.log('User remove err:::', error);
+          }else {
+            console.log("USER DELETED FROM MYDB");
+            cb();
+          }
+
+        })
+
         console.log('disconnect')
  
     })
